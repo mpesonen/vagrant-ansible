@@ -1,0 +1,2 @@
+[tomcat-servers]
+web1 ansible_ssh_user=vagrant

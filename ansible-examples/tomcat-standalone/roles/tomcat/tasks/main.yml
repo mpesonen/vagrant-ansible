@@ -1,0 +1,50 @@
+---
+
+- name: Install Java and other dependencies
+  yum: name={{ item }} state=present
+  with_items:
+    - java-1.7.0-openjdk
+    - nano
+    - zip
+    - unzip
+    - wget
+
+- name: add group "tomcat"
+  group: name=tomcat
+
+- name: add user "tomcat"
+  user: name=tomcat group=tomcat state=present home=no
+  sudo: yes
+
+- name: Download Tomcat
+  get_url: url=http://www.eng.lsu.edu/mirrors/apache/tomcat/tomcat-7/v7.0.52/bin/apache-tomcat-7.0.52.tar.gz dest=/opt/apache-tomcat-7.0.52.tar.gz
+
+- name: Extract archive
+  command: chdir=/opt /bin/tar xvf /opt/apache-tomcat-7.0.52.tar.gz -C /opt/ creates=/opt/apache-tomcat-7.0.52
+
+- name: Symlink install directory
+  file: src=/opt/apache-tomcat-7.0.52 path=/usr/share/tomcat state=link
+
+- name: Change ownership of Tomcat installation
+  file: path=/usr/share/tomcat/ owner=tomcat group=tomcat state=directory recurse=yes
+
+- name: Configure Tomcat server
+  template: src=server.xml dest=/usr/share/tomcat/conf/
+  notify: restart tomcat
+
+- name: Configure Tomcat users
+  template: src=tomcat-users.xml dest=/usr/share/tomcat/conf/
+  notify: restart tomcat
+
+- name: Install Tomcat init script
+  copy: src=tomcat-initscript.sh dest=/etc/init.d/tomcat mode=0755
+
+- name: deploy iptables rules
+  template: src=iptables-save dest=/etc/sysconfig/iptables
+  notify: restart iptables
+  
+- name: Start Tomcat
+  service: name=tomcat state=started enabled=yes
+
+- name: wait for tomcat to start
+  wait_for: port={{http_port}}
