@@ -13,7 +13,7 @@
   group: name=tomcat
 
 - name: add user "tomcat"
-  user: name=tomcat group=tomcat state=present home=no
+  user: name=tomcat group=tomcat state=present
   sudo: yes
 
 - name: Download Tomcat
@@ -44,7 +44,8 @@
   notify: restart iptables
   
 - name: Start Tomcat
-  service: name=tomcat state=started enabled=yes
+  service: name=tomcat pattern=/usr/share/tomcat state=started enabled=yes
+  sudo: yes
 
 - name: wait for tomcat to start
   wait_for: port={{http_port}}
