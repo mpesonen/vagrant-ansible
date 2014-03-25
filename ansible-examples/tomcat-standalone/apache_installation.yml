@@ -1,0 +1,9 @@
+---
+# This playbook installs Apache on RedHat/Centos Tomcat servers
+
+- hosts: tomcat-servers 
+  user: vagrant
+  sudo: yes
+
+  roles:
+    - apache

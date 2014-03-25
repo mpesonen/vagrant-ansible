@@ -1,5 +1,6 @@
 # Here are variables related to the Tomcat installation
 
+apache_port: 80
 http_port: 8080
 https_port: 8443
 
@@ -7,3 +8,7 @@ https_port: 8443
 
 admin_username: admin
 admin_password: adminsecret
+
+# Apache variables
+maxclients: 310
+
